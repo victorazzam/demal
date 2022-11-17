@@ -1,0 +1,150 @@
+// Taken from https://github.com/mal-lang/malcompiler/blob/master/update_mal/new-spec.mal
+
+#id: "tmp"
+#version: "0.0.0"
+
+// Unicode: 🙃
+/*
+include "a"
+include "a // not a comment"
+include "a.b"
+include "a b" 
+include "a/b"
+include "a\b"*/
+
+category C1 {
+}
+
+category C2
+  user info: "info"
+{
+  asset A1 {
+    & At1
+    | At2
+    # At3
+    !E At4
+    E At5
+  }
+
+  asset A2
+    user info: "info"
+  {
+    & At1 [Bernoulli(0.7)]
+    & At2 [Binomial(0.5, 0.6)]
+    & At3 [Exponential(0.1)]
+    & At4 [Gamma(0.1, 0.2)]
+    & At5 [Infinity]
+    & At6 [LogNormal(1, 3)]
+    & At7 [Normal(1.1, 2.0)]
+    & At8 [Pareto(1.0, 0)]
+    & At9 [TruncatedNormal(1.2, 1.3)]
+    & At10 [Uniform(0, 10)]
+    & At11 [Zero]
+  }
+
+  asset A3
+    developer info: "rationale"
+  {
+    & At1
+    & At2
+      user info: "info"
+    & At3
+      developer info: "rationale"
+    & At4
+      modeler info: "assumptions"
+    & At5
+      user info: "info"
+      modeler info: "assumptions"
+    & At6
+      user info: "info"
+      developer info: "rationale"
+      modeler info: "assumptions"
+  }
+
+  asset A4
+    modeler info: "assumptions"
+  {
+    & A1
+      <- A
+    & A2
+      <- A, B
+  }
+
+  asset A5
+    user info: "info"
+    modeler info: "assumptions"
+  {
+    & A1
+      -> let v1 = a,
+         a.b,
+         (a),
+         (a)[t],
+         a /\ b,
+         a \/ b,
+         a /\ b \/ c,
+         a[t],
+         a*,
+         a[t]*
+    & A2
+      +> a
+  }
+
+  asset A6
+    user info: "info"
+    developer info: "rationale"
+    modeler info: "assumptions"
+  {
+  }
+}
+
+category C3
+  developer info: "rationale"
+{
+  asset A1 extends A1 {
+  }
+}
+
+category C4
+  modeler info: "assumptions"
+{
+  abstract asset A1 {
+  }
+}
+
+category C5
+  user info: "info"
+  modeler info: "assumptions"
+{
+  asset distribution {
+  }
+}
+
+category C6
+  user info: "info"
+  developer info: "rationale"
+  modeler info: "assumptions"
+{
+}
+
+associations {
+  I1 [t1] 1   <-- I2 --> 0..1 [t2] I3
+  I4 [t3] 1..* <-- I5 --> *   [t4] I6
+}
+
+associations {
+  A  [a]  1   <-- A  --> 1   [a]  A
+    user info: "info"
+  A  [a]  1   <-- A  --> 1   [a]  A
+    developer info: "rationale"
+  A  [a]  1   <-- A  --> 1   [a]  A
+    modeler info: "assumptions"
+  A  [a]  1   <-- A  --> 1   [a]  A
+    user info: "info"
+    modeler info: "assumptions"
+  A  [a]  1   <-- A  --> 1   [a]  A
+    user info: "info"
+    developer info: "rationale"
+    modeler info: "assumptions"
+}
+
+// Comment
