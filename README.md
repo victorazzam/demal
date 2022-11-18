@@ -43,6 +43,11 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ~ cat file.mal | python demal.py - out.json
 ```
 
+### Convert several files and view them interactively
+```shell
+~ cat file1.mal file2.mal | python demal.py - - | less
+```
+
 ### Display debugging information while converting
 ```shell
 ~ python demal.py test1.mal debug
