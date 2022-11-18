@@ -1,51 +1,130 @@
+#!/usr/bin/env python3
+
 '''
-Mal-lang (https://mal-lang.org) parser.
+demal
+-----
+MAL (Meta Attack Language) to JSON decoding library and command-line tool.
+https://mal-lang.org
+
+Repo: https://github.com/victorazzam/demal
 Author: Victor Azzam
-Version: 1.0.0
-
-Limitations:
- [-] Quotation marks must not be escaped.
- [-] Expects clean spec-compliant code.
+Version: 1.1.0
 '''
 
-import re, sys, json, inspect
+import io, re, sys, json, inspect
 
 class MalParser:
     '''
     Mal language parser that converts .mal files into JSON data.
-    Spec: https://github.com/mal-lang/malcompiler/wiki/MAL-language-specification
-    Syntax: https://github.com/mal-lang/mal-documentation/wiki/MAL-Syntax
-    Reference: malcompiler-lib/src/main/java/org/mal_lang/compiler/lib/Lexer.java
-    Guide: https://nse.digital/pages/guides/Creating%20threat%20models/MAL.html
-    Mal author video: https://play.kth.se/media/t/0_ckc2056q
     '''
 
-    def __init__(self, file):
+    def __init__(self, file, debug = False):
+        '''
+        Create new instance.
+        '''
         self.src = file
         self.result = {}
+        self.stop = True
+        self.debug = debug
 
     def __repr__(self):
         '''
-        Define
+        Representation when referenced.
         '''
-        return json.dumps(self.result, sort_keys=True, indent=2)
+        return json.dumps(self.result, sort_keys=True, indent=2) + '\n'
 
-    def dump_json(self, out = None, pretty = True):
+    def __str__(self):
+        '''
+        String representation, minified.
+        '''
+        return json.dumps(self.result, sort_keys=True)
+
+    def __add__(self, other):
+        '''
+        Handle: addition, multiplication, bitwise-or.
+        The result will always be a union between both dictionaries.
+        '''
+        if isinstance(other, (dict, MalParser)):
+            new = MalParser(self.src, self.debug)
+            new.result = self.result.copy()
+            newdata = other if type(other) is dict else other.result
+            for key in newdata:
+                one, two = new.result.get(key), newdata[key]
+                if key in ('associations', 'categories') and type(one) == type(two) == dict:
+                    one.update(two)
+                else:
+                    new.result[key] = newdata[key]
+            return new
+        raise SyntaxError(f'MalParser does not support combining with {type(other)} objects.')
+
+    # Let __add__ handle + * | for consistency.
+    __radd__ = __mul__ = __rmul__ = __or__ = __ror__ = __add__
+
+    def __getitem__(self, item):
+        '''
+        Allow access to underlying result dictionary and conversion to dict type.
+        '''
+        return self.result.get(item)
+
+    def __iter__(self):
+        '''
+        Allow iteration using for loops.
+        '''
+        self.i = 0
+        self.keys = []
+        for key in self.result:
+            if key in ('associations', 'categories') and type(self.result[key]) is dict:
+                for sub in sorted(self.result[key]):
+                    self.keys.append(sub)
+            else:
+                self.keys.append(key)
+        return self
+
+    def __next__(self):
+        '''
+        Allow iteration using for loops.
+        '''
+        if self.i >= len(self.keys):
+            del self.i, self.keys
+            raise StopIteration
+        self.i += 1
+        return self.keys[self.i - 1]
+
+    def quit(self, msg='Exiting.'):
+        '''
+        Handle exit message and stop parsing.
+        '''
+        print(msg, file=sys.stderr, flush=True)
+        self.stop = True
+
+    def dump(self, out = None, pretty = True):
         '''
         Output a JSON file with the results.
         '''
         pretty = pretty is True
-        out = out if out else f'{self.src}.json'
-        with open(out, 'w') as f:
-            json.dump(self.result, f, sort_keys = pretty, indent = 2 * pretty)
+        output = 'output.mal.json'
+        if type(out) is str and out:
+            output = out
+        elif out == sys.stdout:
+            for i in (repr(self) if pretty else str(self)).splitlines():
+                print(i)
+            return
+        elif type(self.src) is str:
+            output = self.src + '.json'
+        with io.open(output, 'w', newline='\n') as f:
+            json.dump(self.result, f, sort_keys=pretty, indent=pretty*2)
+            f.write('\n')
 
-    @staticmethod
-    def iterate(file):
+    def iterate(self, file):
         '''
         Iterate a file line by line.
         '''
+        w = '\x1b[97m' # white
+        r = '\x1b[91m' # red
+        z = '\x1b[m' # end
         try:
-            with open(file) as f:
+            file = file if file is sys.stdin else open(file)
+            with file as f:
                 data = f.read()
 
                 # Remove comments.
@@ -56,22 +135,24 @@ class MalParser:
 
                 # Yield non-empty lines.
                 for line in data.splitlines():
-                    if line.strip():
-                        if globals().get('debug') == True:
-                            print(inspect.stack()[1].function, 'got:\x1b[92;1m', repr(line.strip()), '\x1b[m')
-                        yield line.strip()
+                    if not self.stop and (L := line.strip()):
+                        if self.debug:
+                            print(w + inspect.stack()[1].function, z + 'got:' + r, repr(L) + z, file=sys.stderr, flush=True)
+                        yield L
+        except BrokenPipeError:
+            pass
         except IOError:
-            quit(f'Error while opening {file}')
+            self.quit(f'Error while opening {file}')
 
     def parse(self, file = None):
         '''
-        Parses individual files, recursively evaluating imports (includes).
+        Parse individual files, recursively evaluating includes/imports.
         '''
+        self.stop = False
         file = file if file else self.src
         code = self.iterate(file)
 
         # Regular expressions for the main declarations
-        #r_end = r'\s*(//.*)?$' # for inline comments
         r_define = re.compile(r'#(\w+):\s*"([^"]*)"')
         r_include = re.compile(r'include "([^"]*)"')
         r_category = re.compile(r'category \w+')
@@ -89,11 +170,11 @@ class MalParser:
                 elif r_associations.match(line):
                     self.parse_associations(code, line)
                 else:
-                    quit(f'Improper syntax: {repr(line)}')
+                    self.quit(f'Improper syntax: {repr(line)}')
         except StopIteration:
-            quit(f'Incomplete script at:\n {repr(line)}')
-        #except Exception as e:
-        #    quit(f'Error at: {repr(line)}\nMessage: {e}')
+            self.quit(f'Incomplete script at:\n {repr(line)}')
+        except Exception as e:
+            self.quit(f'Error at: {repr(line)}\nMessage: {e}')
 
     def parse_header(self, code, line, cat=None):
         '''
@@ -120,7 +201,7 @@ class MalParser:
                 'assets': {}
             }
         else:
-            quit(f'Improper syntax: {repr(line)}')
+            self.quit(f'Improper syntax: {repr(line)}')
 
         # Metadata
         if '{' not in line:
@@ -151,14 +232,8 @@ class MalParser:
         X.A      collect (asset X's attack step A)
         X*.A     transitive, e.g. dir.subdir.subdir.file can be dir*.file
         [prob]   probability distribution, one of:
-                    Bernoulli(p)
-                    Binomial(n, p)
-                    Exponential(λ)
-                    Gamma(k, θ)
-                    LogNormal(μ, σ)
-                    Pareto(x, α)
-                    TruncatedNormal(μ, σ^2)
-                    Uniform(a, b)
+                    Bernoulli(p)     Binomial(n, p)  Exponential(λ)           Gamma(k, θ)
+                    LogNormal(μ, σ)  Pareto(x, α)    TruncatedNormal(μ, σ^2)  Uniform(a, b)
         {C,I,A}  (securiCAD only) confidentiality, integrity, availability (any combination)
         @hidden  (securiCAD only) hide from attack paths
         @debug   (securiCAD only) show only while testing
@@ -189,9 +264,12 @@ class MalParser:
                 line = line[2 + (not line[0].isalpha()):]
                 self.parse_expression(code, line, field)
             else:
-                quit(f'Improper syntax: {repr(line)}')
+                self.quit(f'Improper syntax: {repr(line)}')
 
     def parse_expression(self, code, line, field):
+        '''
+        Parse asset expressions.
+        '''
         r_let = re.compile(r'let ([A-Za-z_]\w*)\s*=\s*"?([^"]+)"?')
         i = 0
         while 1:
@@ -199,7 +277,7 @@ class MalParser:
                 name, value = r.groups()
             else:
                 name, value, i = (i, line, i+1)
-            field[str(name)] = [value.rstrip(',')]
+            field[str(name)] = value.rstrip(',')
             if not line.endswith(','):
                 break
             line = next(code)
@@ -235,25 +313,46 @@ class MalParser:
             elif (r := r_meta.match(line)) and last_link:
                 last_link['meta'][r.group(1)] = r.group(2)
 
-def main(f, out):
-    mal = MalParser(f)
-    mal.parse()
-    if out == '-':
-        print(mal)
+def cli(arg):
+    r, g, y, b, c, w, u, z = (f'\x1b[{x}m' for x in (91, 92, 93, 94, 96, 97, 4, 0))
+    usage = f'''
+{w}Usage:{z} python demal.py <{g}input{z}> [{c}output{z}] [{y}debug{z}]\n
+ {g}input {w}format:{z}  {u}somefile.mal{z}  {w}or {r}- {w}to read from stdin
+ {c}output {w}format:{z} {u}somefile.json{z} {w}or {r}- {w}to write to stdout\n
+ {w}if {c}output {w}is missing, demal will either:
+  write to{z} {u}somefile.mal.json{z} {w}if {g}input {w}is{z} {u}somefile.mal{z}
+  {w}write to{z} {u}output.mal.json{z} {w}if {g}input {w}is {r}- {w}(stdout)\n
+ append {y}debug {w}to print debug trace messages{z}
+'''
+    if len(arg) < 2:
+        sys.exit(usage)
+    elif arg[1] == '-':
+        file = sys.stdin
+    elif arg[1].lower().endswith('.mal'):
+        file = arg[1]
     else:
-        mal.dump_json(out=out, pretty=True)
+        sys.exit(usage)
+    out = None
+    if len(arg) > 2:
+        if arg[2] == '-':
+            out = sys.stdout
+        elif arg[2].lower().endswith('.json'):
+            out = arg[2]
+        elif arg[2] == 'debug':
+            pass
+        else:
+            sys.exit(usage)
+    return file, out, 'debug' in arg
 
-def quit(msg='Exiting.'):
-    print(msg, file=sys.stderr, flush=True)
-    sys.exit()
+def main(file, out, debug = False):
+    mal = MalParser(file, debug=debug)
+    mal.parse()
+    mal.dump(out=out, pretty=True)
 
 if __name__ == '__main__':
     try:
-        args = sys.argv
-        debug = 'debug' in args
-        if len(args) < 2 or not args[1].lower().endswith('.mal'):
-            quit(f'Usage: {args[0]} file.mal [output.json] [debug]')
-        output = args[2] if len(args) > 2 and (args[2].lower().endswith('.json') or args[2] == '-') else None
-        main(args[1], output)
+        main(*cli(sys.argv))
     except (KeyboardInterrupt, EOFError):
         print('\nInterrupted.')
+else:
+    del cli

@@ -1,0 +1,368 @@
+{
+  "associations": {
+    "A": {
+      "asset_l": "A",
+      "asset_r": "A",
+      "field_l": "a",
+      "field_r": "a",
+      "meta": {
+        "developer info": "rationale",
+        "modeler info": "assumptions",
+        "user info": "info"
+      },
+      "mult_l": "1",
+      "mult_r": "1"
+    },
+    "I2": {
+      "asset_l": "I1",
+      "asset_r": "I3",
+      "field_l": "t1",
+      "field_r": "t2",
+      "meta": {},
+      "mult_l": "1",
+      "mult_r": "0..1"
+    },
+    "I5": {
+      "asset_l": "I4",
+      "asset_r": "I6",
+      "field_l": "t3",
+      "field_r": "t4",
+      "meta": {},
+      "mult_l": "1..*",
+      "mult_r": "*"
+    }
+  },
+  "categories": {
+    "C1": {
+      "assets": {},
+      "meta": {}
+    },
+    "C2": {
+      "assets": {
+        "A1": {
+          "abstract": false,
+          "attributes": {
+            "At1": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "At2": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            },
+            "At3": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "defense"
+            },
+            "At4": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "lacks"
+            },
+            "At5": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "exists"
+            }
+          },
+          "extends": null,
+          "meta": {}
+        },
+        "A2": {
+          "abstract": false,
+          "attributes": {
+            "At1": {
+              "cia": null,
+              "meta": {},
+              "probability": "Bernoulli(0.7)",
+              "tags": [],
+              "type": "and"
+            },
+            "At10": {
+              "cia": null,
+              "meta": {},
+              "probability": "Uniform(0, 10)",
+              "tags": [],
+              "type": "and"
+            },
+            "At11": {
+              "cia": null,
+              "meta": {},
+              "probability": "Zero",
+              "tags": [],
+              "type": "and"
+            },
+            "At2": {
+              "cia": null,
+              "meta": {},
+              "probability": "Binomial(0.5, 0.6)",
+              "tags": [],
+              "type": "and"
+            },
+            "At3": {
+              "cia": null,
+              "meta": {},
+              "probability": "Exponential(0.1)",
+              "tags": [],
+              "type": "and"
+            },
+            "At4": {
+              "cia": null,
+              "meta": {},
+              "probability": "Gamma(0.1, 0.2)",
+              "tags": [],
+              "type": "and"
+            },
+            "At5": {
+              "cia": null,
+              "meta": {},
+              "probability": "Infinity",
+              "tags": [],
+              "type": "and"
+            },
+            "At6": {
+              "cia": null,
+              "meta": {},
+              "probability": "LogNormal(1, 3)",
+              "tags": [],
+              "type": "and"
+            },
+            "At7": {
+              "cia": null,
+              "meta": {},
+              "probability": "Normal(1.1, 2.0)",
+              "tags": [],
+              "type": "and"
+            },
+            "At8": {
+              "cia": null,
+              "meta": {},
+              "probability": "Pareto(1.0, 0)",
+              "tags": [],
+              "type": "and"
+            },
+            "At9": {
+              "cia": null,
+              "meta": {},
+              "probability": "TruncatedNormal(1.2, 1.3)",
+              "tags": [],
+              "type": "and"
+            }
+          },
+          "extends": null,
+          "meta": {
+            "user info": "info"
+          }
+        },
+        "A3": {
+          "abstract": false,
+          "attributes": {
+            "At1": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "At2": {
+              "cia": null,
+              "meta": {
+                "user info": "info"
+              },
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "At3": {
+              "cia": null,
+              "meta": {
+                "developer info": "rationale"
+              },
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "At4": {
+              "cia": null,
+              "meta": {
+                "modeler info": "assumptions"
+              },
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "At5": {
+              "cia": null,
+              "meta": {
+                "modeler info": "assumptions",
+                "user info": "info"
+              },
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "At6": {
+              "cia": null,
+              "meta": {
+                "developer info": "rationale",
+                "modeler info": "assumptions",
+                "user info": "info"
+              },
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            }
+          },
+          "extends": null,
+          "meta": {
+            "developer info": "rationale"
+          }
+        },
+        "A4": {
+          "abstract": false,
+          "attributes": {
+            "A1": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "require": {
+                "0": "A"
+              },
+              "tags": [],
+              "type": "and"
+            },
+            "A2": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "require": {
+                "0": "A, B"
+              },
+              "tags": [],
+              "type": "and"
+            }
+          },
+          "extends": null,
+          "meta": {
+            "modeler info": "assumptions"
+          }
+        },
+        "A5": {
+          "abstract": false,
+          "attributes": {
+            "A1": {
+              "cia": null,
+              "leads_to": {
+                "0": "a.b",
+                "1": "(a)",
+                "2": "(a)[t]",
+                "3": "a /\\ b",
+                "4": "a \\/ b",
+                "5": "a /\\ b \\/ c",
+                "6": "a[t]",
+                "7": "a*",
+                "8": "a[t]*",
+                "v1": "a"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "A2": {
+              "append": {
+                "0": "a"
+              },
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            }
+          },
+          "extends": null,
+          "meta": {
+            "modeler info": "assumptions",
+            "user info": "info"
+          }
+        },
+        "A6": {
+          "abstract": false,
+          "attributes": {},
+          "extends": null,
+          "meta": {
+            "developer info": "rationale",
+            "modeler info": "assumptions",
+            "user info": "info"
+          }
+        }
+      },
+      "meta": {
+        "user info": "info"
+      }
+    },
+    "C3": {
+      "assets": {
+        "A1": {
+          "abstract": false,
+          "attributes": {},
+          "extends": "A1",
+          "meta": {}
+        }
+      },
+      "meta": {
+        "developer info": "rationale"
+      }
+    },
+    "C4": {
+      "assets": {
+        "A1": {
+          "abstract": true,
+          "attributes": {},
+          "extends": null,
+          "meta": {}
+        }
+      },
+      "meta": {
+        "modeler info": "assumptions"
+      }
+    },
+    "C5": {
+      "assets": {
+        "distribution": {
+          "abstract": false,
+          "attributes": {},
+          "extends": null,
+          "meta": {}
+        }
+      },
+      "meta": {
+        "modeler info": "assumptions",
+        "user info": "info"
+      }
+    },
+    "C6": {
+      "assets": {},
+      "meta": {
+        "developer info": "rationale",
+        "modeler info": "assumptions",
+        "user info": "info"
+      }
+    }
+  },
+  "id": "tmp",
+  "version": "0.0.0"
+}

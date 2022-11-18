@@ -1,0 +1,146 @@
+{
+  "associations": {
+    "Credentials": {
+      "asset_l": "User",
+      "asset_r": "Password",
+      "field_l": "user",
+      "field_r": "passwords",
+      "meta": {},
+      "mult_l": "1",
+      "mult_r": "*"
+    },
+    "NetworkAccess": {
+      "asset_l": "Network",
+      "asset_r": "Host",
+      "field_l": "networks",
+      "field_r": "hosts",
+      "meta": {},
+      "mult_l": "*",
+      "mult_r": "*"
+    }
+  },
+  "categories": {
+    "System": {
+      "assets": {
+        "Host": {
+          "abstract": false,
+          "attributes": {
+            "access": {
+              "cia": null,
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "and"
+            },
+            "authenticate": {
+              "cia": null,
+              "leads_to": {
+                "0": "access"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            },
+            "connect": {
+              "cia": null,
+              "leads_to": {
+                "0": "access"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            },
+            "guessPassword": {
+              "cia": null,
+              "leads_to": {
+                "0": "guessedPassword"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            },
+            "guessedPassword": {
+              "cia": null,
+              "leads_to": {
+                "0": "authenticate"
+              },
+              "meta": {},
+              "probability": "Exponential(0.02)",
+              "tags": [],
+              "type": "or"
+            }
+          },
+          "extends": null,
+          "meta": {}
+        },
+        "Network": {
+          "abstract": false,
+          "attributes": {
+            "access": {
+              "cia": null,
+              "leads_to": {
+                "0": "hosts.connect"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            }
+          },
+          "extends": null,
+          "meta": {}
+        },
+        "Password": {
+          "abstract": false,
+          "attributes": {
+            "obtain": {
+              "cia": null,
+              "leads_to": {
+                "0": "host.authenticate"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            }
+          },
+          "extends": null,
+          "meta": {}
+        },
+        "User": {
+          "abstract": false,
+          "attributes": {
+            "attemptPhishing": {
+              "cia": null,
+              "leads_to": {
+                "0": "phish"
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [],
+              "type": "or"
+            },
+            "phish": {
+              "cia": null,
+              "leads_to": {
+                "0": "passwords.obtain"
+              },
+              "meta": {},
+              "probability": "Exponential(0.1)",
+              "tags": [],
+              "type": "or"
+            }
+          },
+          "extends": null,
+          "meta": {}
+        }
+      },
+      "meta": {}
+    }
+  },
+  "id": "org.mal-lang.examplelang",
+  "version": "1.0.0"
+}
