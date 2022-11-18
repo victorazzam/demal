@@ -16,7 +16,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ## Usage
 
 ### General usage
-![usage.png](usage.png)
+![usage.jpg](usage.jpg)
 
 ### Convert `file.mal` to `file.mal.json`
 ```shell
