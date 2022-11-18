@@ -67,7 +67,7 @@ mal.debug = True
 mal.parse() # displays debugging messages due to the previous line
 # output suppressed
 
-mal.dump_json(out='parsed.json', pretty=True) # beautify and save to parsed.json
+mal.dump(out='parsed.json', pretty=True) # beautify and save to parsed.json
 print(mal) # pretty-prints the json object
 {
   "associations": {
