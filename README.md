@@ -2,6 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/demal?logo=git&style=flat)](https://pypi.python.org/pypi/demal)
 [![Build](https://github.com/victorazzam/demal/actions/workflows/python-package.yml/badge.svg)](https://github.com/victorazzam/demal/actions/workflows/python-package.yml)
+[![Python](https://img.shields.io/pypi/pyversions/demal?logo=python&logoColor=yellow)](https://www.python.org/doc/versions/)
+[![License](https://img.shields.io/github/license/victorazzam/demal)](https://github.com/victorazzam/demal/blob/master/LICENSE)
 
 MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
