@@ -11,7 +11,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 **License:** MIT
 
-**Latest version:** `1.2.0`
+**Latest version:** `1.2.1`
 
 **Requires:** Python 3.8 or later
 
