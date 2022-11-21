@@ -30,7 +30,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ```
 
 ### General usage
-![usage.jpg](usage.jpg)
+![https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg](https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg)
 
 ### Convert `file.mal` to `file.mal.json`
 ```shell
