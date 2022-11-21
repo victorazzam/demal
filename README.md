@@ -1,6 +1,6 @@
 # demal
 
-[![PyPI](https://img.shields.io/pypi/v/demal?logo=git&style=flat)](https://pypi.python.org/pypi/torrentstream)
+[![PyPI](https://img.shields.io/pypi/v/demal?logo=git&style=flat)](https://pypi.python.org/pypi/demal)
 
 MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
