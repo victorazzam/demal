@@ -11,7 +11,7 @@ setup(
                         license = 'MIT',
                             url = 'https://github.com/victorazzam/demal',
                    download_url = "https://github.com/victorazzam/demal/releases",
-                        version = '1.2.1',
+                        version = '1.2.0',
                 python_requires = '>=3.8',
                        packages = ['demal'],
                    entry_points = {

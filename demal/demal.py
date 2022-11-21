@@ -8,7 +8,7 @@ https://mal-lang.org
 
 Repo: https://github.com/victorazzam/demal
 Author: Victor Azzam
-Version: 1.2.1
+Version: 1.2.0
 '''
 
 import io, re, sys, copy, json, inspect
