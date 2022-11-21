@@ -3,13 +3,12 @@
 '''
 demal
 -----
-MAL (Meta Attack Language) to JSON decoding library and command-line tool.
-https://mal-lang.org
-
+Description: MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 Repo: https://github.com/victorazzam/demal
 Author: Victor Azzam
-Version: 1.2.1
 '''
+
+__version__ = '1.2.2'
 
 import io, re, sys, copy, json, inspect
 
@@ -333,6 +332,9 @@ def cli(arg):
   {w}write to{z} {u}output.mal.json{z} {w}if {g}input {w}is {r}- {w}(stdout)\n
  append {y}debug {w}to print debug trace messages{z}
 '''
+    if '-v' in arg or '--version' in arg:
+        print(__version__)
+        sys.exit(0)
     if len(arg) < 2:
         sys.exit(usage)
     elif arg[1] == '-':

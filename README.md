@@ -1,6 +1,7 @@
 # demal
 
 [![PyPI](https://img.shields.io/pypi/v/demal?logo=git&style=flat)](https://pypi.python.org/pypi/demal)
+[![Build](https://github.com/victorazzam/demal/actions/workflows/python-package.yml/badge.svg)](https://github.com/victorazzam/demal/actions/workflows/python-package.yml)
 
 MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
@@ -10,7 +11,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 **License:** MIT
 
-**Latest version:** `1.2.1`
+**Latest version:** `1.2.2`
 
 **Requires:** Python 3.8 or later
 
@@ -19,6 +20,11 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ## Usage
 
 ### Install
+```shell
+~ pip install demal
+```
+
+### Install from source
 ```shell
 ~ git clone https://github.com/victorazzam/demal
 ~ cd demal && pip install .
