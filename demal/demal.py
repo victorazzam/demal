@@ -8,10 +8,10 @@ https://mal-lang.org
 
 Repo: https://github.com/victorazzam/demal
 Author: Victor Azzam
-Version: 1.1.0
+Version: 1.2.0
 '''
 
-import io, re, sys, json, inspect
+import io, re, sys, copy, json, inspect
 
 class MalParser:
     '''
@@ -20,7 +20,7 @@ class MalParser:
 
     def __init__(self, file, debug = False):
         '''
-        Create new instance.
+        Create new instance without parsing the MAL source file yet.
         '''
         self.src = file
         self.result = {}
@@ -46,19 +46,24 @@ class MalParser:
         '''
         if isinstance(other, (dict, MalParser)):
             new = MalParser(self.src, self.debug)
-            new.result = self.result.copy()
-            newdata = other if type(other) is dict else other.result
+            new.result = copy.deepcopy(self.result)
+            newdata = copy.deepcopy(other if type(other) is dict else other.result)
             for key in newdata:
-                one, two = new.result.get(key), newdata[key]
-                if key in ('associations', 'categories') and type(one) == type(two) == dict:
-                    one.update(two)
+                n, newer = new.result.get(key), newdata[key]
+                if type(n) == type(newer) == dict:
+                    if key == 'categories' and all(type(y) is dict and 'assets' in y and 'meta' in y for x in (n, newer) for y in x):
+                        for cat in n:
+                            for i in ('assets', 'meta'):
+                                n[cat][i].update(newer[cat][i])
+                    else:
+                        n.update(newer)
                 else:
                     new.result[key] = newdata[key]
             return new
         raise SyntaxError(f'MalParser does not support combining with {type(other)} objects.')
 
     # Let __add__ handle + * | for consistency.
-    __radd__ = __mul__ = __rmul__ = __or__ = __ror__ = __add__
+    __rmul__ = __mul__ = __ror__ = __or__ = __radd__ = __add__
 
     def __getitem__(self, item):
         '''
@@ -68,27 +73,26 @@ class MalParser:
 
     def __iter__(self):
         '''
-        Allow iteration using for loops.
+        Allow iteration of assets using for loops.
         '''
         self.i = 0
-        self.keys = []
-        for key in self.result:
-            if key in ('associations', 'categories') and type(self.result[key]) is dict:
-                for sub in sorted(self.result[key]):
-                    self.keys.append(sub)
-            else:
-                self.keys.append(key)
+        self.assets = []
+        for cat in self.result.get('categories', []):
+            category = self.result['categories'][cat]
+            if type(category) is dict:
+                for asset in sorted(category.get('assets', [])):
+                    self.assets.append(f'{cat}.{asset}')
         return self
 
     def __next__(self):
         '''
-        Allow iteration using for loops.
+        Allow iteration of assets using for loops.
         '''
-        if self.i >= len(self.keys):
-            del self.i, self.keys
+        if self.i >= len(self.assets):
+            del self.i, self.assets
             raise StopIteration
         self.i += 1
-        return self.keys[self.i - 1]
+        return self.assets[self.i - 1]
 
     def quit(self, msg='Exiting.'):
         '''
@@ -314,12 +318,17 @@ class MalParser:
                 last_link['meta'][r.group(1)] = r.group(2)
 
 def cli(arg):
-    r, g, y, b, c, w, u, z = (f'\x1b[{x}m' for x in (91, 92, 93, 94, 96, 97, 4, 0))
+    '''
+    Handle command line arguments.
+    '''
+    import os
+    colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
+    r, g, y, b, c, w, u, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,4,0))
     usage = f'''
-{w}Usage:{z} python demal.py <{g}input{z}> [{c}output{z}] [{y}debug{z}]\n
+{w}Usage:{z} demal <{g}input{z}> [{c}output{z}] [{y}debug{z}]\n
  {g}input {w}format:{z}  {u}somefile.mal{z}  {w}or {r}- {w}to read from stdin
  {c}output {w}format:{z} {u}somefile.json{z} {w}or {r}- {w}to write to stdout\n
- {w}if {c}output {w}is missing, demal will either:
+ {w}if {c}output {w}is missing, the program will either:
   write to{z} {u}somefile.mal.json{z} {w}if {g}input {w}is{z} {u}somefile.mal{z}
   {w}write to{z} {u}output.mal.json{z} {w}if {g}input {w}is {r}- {w}(stdout)\n
  append {y}debug {w}to print debug trace messages{z}
@@ -344,15 +353,17 @@ def cli(arg):
             sys.exit(usage)
     return file, out, 'debug' in arg
 
-def main(file, out, debug = False):
+def main():
+    '''
+    Run as a standalone application.
+    '''
+    file, out, debug = cli(sys.argv)
     mal = MalParser(file, debug=debug)
     mal.parse()
     mal.dump(out=out, pretty=True)
 
 if __name__ == '__main__':
     try:
-        main(*cli(sys.argv))
+        main()
     except (KeyboardInterrupt, EOFError):
         print('\nInterrupted.')
-else:
-    del cli

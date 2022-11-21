@@ -1,4 +1,5 @@
 # demal
+
 MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 ## Info
@@ -7,7 +8,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 **License:** MIT
 
-**Latest version:** `1.1.0`
+**Latest version:** `1.2.0`
 
 **Requires:** Python 3.8 or later
 
@@ -15,42 +16,53 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 ## Usage
 
+### Install
+```shell
+~ git clone https://github.com/victorazzam/demal
+~ cd demal && pip install .
+```
+
+### Uninstall
+```shell
+~ pip uninstall demal
+```
+
 ### General usage
 ![usage.jpg](usage.jpg)
 
 ### Convert `file.mal` to `file.mal.json`
 ```shell
-~ python demal.py file.mal
+~ demal file.mal
 ```
 
 ### Convert `file.mal` to `output.json`
 ```shell
-~ python demal.py file.mal output.json
+~ demal file.mal output.json
 ```
 
 ### Convert `file.mal` and print it out
 ```shell
-~ python demal.py file.mal -
+~ demal file.mal -
 ```
 
 ### Read from standard input, convert, and print it out
 ```shell
-~ cat file.mal | python demal.py - -
+~ cat file.mal | demal - -
 ```
 
 ### Read from standard input, convert, and write to `out.json`
 ```shell
-~ cat file.mal | python demal.py - out.json
+~ cat file.mal | demal - out.json
 ```
 
 ### Convert several files and view them interactively
 ```shell
-~ cat file1.mal file2.mal | python demal.py - - | less
+~ cat file1.mal file2.mal | demal - - | less
 ```
 
 ### Display debugging information while converting
 ```shell
-~ python demal.py test1.mal debug
+~ demal test1.mal debug
 parse got: '#id: "tmp"'
 parse got: '#version: "0.0.0"'
 parse got: 'category C1 {'
@@ -83,9 +95,9 @@ print(mal) # pretty-prints the json object
 ```
 
 #### Merge multiple instances by addition (also multiplication and bitwise-or)
-Check `test.py`:
+Check `tests/test-lib.py`:
+
 ```py
-import json
 from demal import MalParser
 
 print('Parsing two test files and combining their results.')
@@ -117,13 +129,16 @@ var = 'abc' # directly modify data
 print('After:', var)
 # After: abc
 
-print('\nListing all categories, associations, and major keys/variables.')
-print(list(m))
-# ['id', 'version', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'System', 'A', 'Credentials', 'I2', 'I5', 'NetworkAccess']
+print('\nListing all assets with dot notation: category.asset')
+print('m1:', list(m1))
+print('m2:', list(m2))
+print('m (m1+m2):', list(m))
+# m1: ['System.Host', 'System.Network', 'System.Password', 'System.User']
+# m2: ['C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
+# m (m1+m2): ['System.Host', 'System.Network', 'System.Password', 'System.User', 'C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
 ```
 
 ## Output
-
 This program produces the following approximate output:
 
 ```py
@@ -197,4 +212,4 @@ This program produces the following approximate output:
  - **MAL author video:** [https://play.kth.se/...](https://play.kth.se/media/t/0_ckc2056q)
  - **Project page:** [https://www.kth.se/...](https://www.kth.se/cs/nse/research/software-systems-architecture-and-security/projects/mal-the-meta-attack-language-1.922174)
  - **Research paper:** [https://dl.acm.org/doi/10.1145/3230833.3232799](https://dl.acm.org/doi/10.1145/3230833.3232799)
- 
+ - **Official MAL to JSON converter:** [mal2json](https://github.com/mal-lang/mal2json)

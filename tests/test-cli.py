@@ -1,4 +1,7 @@
-import os, demal, hashlib
+import os, sys, demal, hashlib
+
+if 'win' in sys.platform:
+    sys.exit('This test is not compatible with Windows operating systems.')
 
 try:
     for t in ('test1.mal', 'test2.mal'):
@@ -6,11 +9,11 @@ try:
         m.parse()
         md5 = hashlib.md5(repr(m).encode()).hexdigest()
         cmds = {
-            f'python demal.py {t} && md5sum {t}.json': f'{t}.json',
-            f'python demal.py {t} abc.json && md5sum abc.json': 'abc.json',
-            f'python demal.py {t} - | md5sum': None,
-            f'cat {t} | python demal.py - && md5sum output.mal.json': 'output.mal.json',
-            f'cat {t} | python demal.py - - | md5sum': None
+          f'demal {t} && md5sum {t}.json'                 : f'{t}.json',
+          f'demal {t} abc.json && md5sum abc.json'        : 'abc.json',
+          f'demal {t} - | md5sum'                         : None,
+          f'cat {t} | demal - && md5sum output.mal.json'  : 'output.mal.json',
+          f'cat {t} | demal - - | md5sum'                 : None
         }
         print(f'Testing: {t}\nExpecting: {md5}\n')
         for cmd in cmds:
@@ -21,4 +24,4 @@ try:
             assert p == md5
     print('Passed')
 except AssertionError:
-    print('Failed')
+    sys.exit('Failed')

@@ -1,4 +1,3 @@
-import json
 from demal import MalParser
 
 print('Parsing two test files and combining their results.')
@@ -30,6 +29,10 @@ var = 'abc' # directly modify data
 print('After:', var)
 # After: abc
 
-print('\nListing all categories, associations, and major keys/variables.')
-print(list(m))
-# ['id', 'version', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'System', 'A', 'Credentials', 'I2', 'I5', 'NetworkAccess']
+print('\nListing all assets with dot notation: category.asset')
+print('m1:', list(m1))
+print('m2:', list(m2))
+print('m (m1+m2):', list(m))
+# m1: ['System.Host', 'System.Network', 'System.Password', 'System.User']
+# m2: ['C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
+# m (m1+m2): ['System.Host', 'System.Network', 'System.Password', 'System.User', 'C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
