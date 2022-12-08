@@ -11,7 +11,13 @@ Author: Victor Azzam
 __version__ = '1.2.3'
 __author__ = 'Victor Azzam'
 
-import io, re, sys, copy, json, inspect
+import os, io, re, sys, copy, json, inspect
+
+# Check if the terminal supports styled output
+colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
+
+# Define red, green, yellow, blue, cyan, white, underline, disable
+r, g, y, b, c, w, u, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,4,0))
 
 class MalParser:
     '''
@@ -123,9 +129,6 @@ class MalParser:
         '''
         Iterate a file line by line.
         '''
-        w = '\x1b[97m' # white
-        r = '\x1b[91m' # red
-        z = '\x1b[m' # end
         try:
             file = file if file is sys.stdin else open(file)
             with file as f:
@@ -321,16 +324,13 @@ def cli(arg):
     '''
     Handle command line arguments.
     '''
-    import os
-    colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
-    r, g, y, b, c, w, u, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,4,0))
     usage = f'''
 {w}Usage:{z} demal <{g}input{z}> [{c}output{z}] [{y}debug{z}] [-v|--version]\n
  {g}input {w}format:{z}  {u}somefile.mal{z}  {w}or {r}- {w}to read from stdin
  {c}output {w}format:{z} {u}somefile.json{z} {w}or {r}- {w}to write to stdout\n
  {w}if {c}output {w}is missing, the program will either:
   write to{z} {u}somefile.mal.json{z} {w}if {g}input {w}is{z} {u}somefile.mal{z}
-  {w}write to{z} {u}output.mal.json{z} {w}if {g}input {w}is {r}- {w}(stdout)\n
+  {w}write to{z} {u}output.mal.json{z} {w}if {g}input {w}is {r}- {w}(stdin)\n
  append {y}debug {w}to print debug trace messages{z}
 '''
     if '-v' in arg or '--version' in arg:

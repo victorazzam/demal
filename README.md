@@ -40,8 +40,6 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ### General usage
 ![https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg](https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg)
 
-<sup>As of v1.2.2 you can add `-v` or `--version` to get the installed version as a period-separated number.</sup>
-
 ### Convert `file.mal` to `file.mal.json`
 ```shell
 ~ demal file.mal
