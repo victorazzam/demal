@@ -13,7 +13,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 **License:** MIT
 
-**Latest version:** `1.2.2`
+**Latest version:** `1.2.3`
 
 **Requires:** Python 3.8 or later
 
@@ -26,7 +26,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ~ pip install demal
 ```
 
-### Install from source
+### Or install from source
 ```shell
 ~ git clone https://github.com/victorazzam/demal
 ~ cd demal && pip install .
@@ -39,6 +39,8 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 ### General usage
 ![https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg](https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg)
+
+<sup>As of v1.2.2 you can add `-v` or `--version` to get the installed version as a period-separated number.</sup>
 
 ### Convert `file.mal` to `file.mal.json`
 ```shell

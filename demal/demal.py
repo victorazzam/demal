@@ -8,7 +8,8 @@ Repo: https://github.com/victorazzam/demal
 Author: Victor Azzam
 '''
 
-__version__ = '1.2.2'
+__version__ = '1.2.3'
+__author__ = 'Victor Azzam'
 
 import io, re, sys, copy, json, inspect
 
@@ -133,7 +134,7 @@ class MalParser:
                 # Remove comments.
                 # https://codegolf.stackexchange.com/a/48346/79525 :D
                 regex = r'("[^\n]*"(?!\\))|(//[^\n]*$|/(?!\\)\*[\s\S]*?\*(?!\\)/)'
-                for comment in re.findall(regex, data, 8):
+                for comment in re.findall(regex, data, re.MULTILINE):
                     data = data.replace(comment[1], '')
 
                 # Yield non-empty lines.
@@ -156,8 +157,8 @@ class MalParser:
         code = self.iterate(file)
 
         # Regular expressions for the main declarations
-        r_define = re.compile(r'#(\w+):\s*"([^"]*)"')
-        r_include = re.compile(r'include "([^"]*)"')
+        r_define = re.compile(r'#(\w+):\s*"(.*)"')
+        r_include = re.compile(r'include "(.*)"')
         r_category = re.compile(r'category \w+')
         r_associations = re.compile(r'associations\s*\{$')
 
@@ -183,9 +184,9 @@ class MalParser:
         '''
         Parse category or asset section header.
         '''
-        r_asset = re.compile(r'(abstract )?asset (\w+)( extends (\w+))?')
+        r_asset = re.compile(r'(abstract)?\s*[Aa]sset (\w+)( extends (\w+))?')
         r_cat = re.compile(r'category (\w+)')
-        r_meta = re.compile(r'([\w ]+):\s+"(.*)"')
+        r_meta = re.compile(r'([\w ]+):\s*"(.*)"')
 
         # Name and possible asset inheritance options
         if (r := r_asset.match(line)):
@@ -244,7 +245,7 @@ class MalParser:
         '''
         r_attr = re.compile(r'([|&#E]{1}|[!E]{2})\s+(\w+)(\s+\[([\w(). ,]+)\])?')
         r_cia = re.compile(r'{\s*([CIA])(,\s*([CIA])(,\s*([CIA]))?)?\s*}')
-        r_meta = re.compile(r'([\w ]+):\s+"(.*)"')
+        r_meta = re.compile(r'([\w ]+):\s*"(.*)"')
         kinds = dict(zip('| & # E !E'.split(), 'or and defense exists lacks'.split()))
         sym = dict(zip('+> -> <-'.split(), 'append leads_to require'.split()))
         last_attr = None
@@ -298,8 +299,8 @@ class MalParser:
         '''
         Parse the association directive.
         '''
-        r_association = re.compile(r'(\w+)\s+\[(\w+)\]\s+([\d*.]+)\s+<--\s+(\w+)\s+-->\s+([\d*.]+)\s+\[(\w+)\]\s+(\w+)')
-        r_meta = re.compile(r'([\w ]+):\s+"(.*)"')
+        r_association = re.compile(r'(\w+)\s+\[(\w+)\]\s+([\d*.]+)\s+<--\s*(\w+)\s*-->\s+([\d*.]+)\s+\[(\w+)\]\s+(\w+)')
+        r_meta = re.compile(r'([\w ]+):\s*"(.*)"')
         last_link = None
 
         while '}' not in (line := next(code)):
@@ -324,7 +325,7 @@ def cli(arg):
     colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
     r, g, y, b, c, w, u, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,4,0))
     usage = f'''
-{w}Usage:{z} demal <{g}input{z}> [{c}output{z}] [{y}debug{z}]\n
+{w}Usage:{z} demal <{g}input{z}> [{c}output{z}] [{y}debug{z}] [-v|--version]\n
  {g}input {w}format:{z}  {u}somefile.mal{z}  {w}or {r}- {w}to read from stdin
  {c}output {w}format:{z} {u}somefile.json{z} {w}or {r}- {w}to write to stdout\n
  {w}if {c}output {w}is missing, the program will either:

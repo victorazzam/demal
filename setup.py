@@ -1,3 +1,4 @@
+from demal.demal import __version__ as version
 from setuptools import setup
 from atexit import register
 from shutil import rmtree
@@ -11,7 +12,7 @@ setup(
                         license = 'MIT',
                             url = 'https://github.com/victorazzam/demal',
                    download_url = "https://github.com/victorazzam/demal/releases",
-                        version = '1.2.2',
+                        version = version,
                 python_requires = '>=3.8',
                        packages = ['demal'],
                    entry_points = {
