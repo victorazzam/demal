@@ -22,6 +22,8 @@ category System {
   asset Network {
     | access
       -> hosts.connect
+      <- abcd.efgh
+      -> ijkl.mnop
   }
 
   asset Host {

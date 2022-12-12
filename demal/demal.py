@@ -267,7 +267,7 @@ class MalParser:
             elif (r := r_meta.match(line)) and last_attr:
                 last_attr['meta'][r.group(1)] = r.group(2)
             elif (pre := line.split()[0]) in sym:
-                field = last_attr[sym[pre]] = {}
+                field = last_attr[sym[pre]] = last_attr[sym[pre]] if sym[pre] in last_attr else {}
                 line = line[2 + (not line[0].isalpha()):]
                 self.parse_expression(code, line, field)
             else:
@@ -278,7 +278,8 @@ class MalParser:
         Parse asset expressions.
         '''
         r_let = re.compile(r'let ([A-Za-z_]\w*)\s*=\s*"?([^"]+)"?')
-        i = 0
+        m = [x for x in field if type(x) is int]
+        i = max(m) + 1 if m else 0
         while 1:
             if (r := r_let.match(line)):
                 name, value = r.groups()

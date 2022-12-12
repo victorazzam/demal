@@ -1,6 +1,75 @@
 {
-  "associations": {
-    "A": {
+  "associations": [
+    {
+      "asset_l": "I1",
+      "asset_r": "I3",
+      "field_l": "t1",
+      "field_r": "t2",
+      "meta": {},
+      "mult_l": "1",
+      "mult_r": "0..1",
+      "name": "I2"
+    },
+    {
+      "asset_l": "I4",
+      "asset_r": "I6",
+      "field_l": "t3",
+      "field_r": "t4",
+      "meta": {},
+      "mult_l": "1..*",
+      "mult_r": "*",
+      "name": "I5"
+    },
+    {
+      "asset_l": "A",
+      "asset_r": "A",
+      "field_l": "a",
+      "field_r": "a",
+      "meta": {
+        "user info": "info"
+      },
+      "mult_l": "1",
+      "mult_r": "1",
+      "name": "A"
+    },
+    {
+      "asset_l": "A",
+      "asset_r": "A",
+      "field_l": "a",
+      "field_r": "a",
+      "meta": {
+        "developer info": "rationale"
+      },
+      "mult_l": "1",
+      "mult_r": "1",
+      "name": "A"
+    },
+    {
+      "asset_l": "A",
+      "asset_r": "A",
+      "field_l": "a",
+      "field_r": "a",
+      "meta": {
+        "modeler info": "assumptions"
+      },
+      "mult_l": "1",
+      "mult_r": "1",
+      "name": "A"
+    },
+    {
+      "asset_l": "A",
+      "asset_r": "A",
+      "field_l": "a",
+      "field_r": "a",
+      "meta": {
+        "modeler info": "assumptions",
+        "user info": "info"
+      },
+      "mult_l": "1",
+      "mult_r": "1",
+      "name": "A"
+    },
+    {
       "asset_l": "A",
       "asset_r": "A",
       "field_l": "a",
@@ -11,27 +80,10 @@
         "user info": "info"
       },
       "mult_l": "1",
-      "mult_r": "1"
-    },
-    "I2": {
-      "asset_l": "I1",
-      "asset_r": "I3",
-      "field_l": "t1",
-      "field_r": "t2",
-      "meta": {},
-      "mult_l": "1",
-      "mult_r": "0..1"
-    },
-    "I5": {
-      "asset_l": "I4",
-      "asset_r": "I6",
-      "field_l": "t3",
-      "field_r": "t4",
-      "meta": {},
-      "mult_l": "1..*",
-      "mult_r": "*"
+      "mult_r": "1",
+      "name": "A"
     }
-  },
+  ],
   "categories": {
     "C1": {
       "assets": {},

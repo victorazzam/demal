@@ -1,24 +1,36 @@
 {
-  "associations": {
-    "Credentials": {
-      "asset_l": "User",
-      "asset_r": "Password",
-      "field_l": "user",
-      "field_r": "passwords",
-      "meta": {},
-      "mult_l": "1",
-      "mult_r": "*"
-    },
-    "NetworkAccess": {
+  "associations": [
+    {
       "asset_l": "Network",
       "asset_r": "Host",
       "field_l": "networks",
       "field_r": "hosts",
       "meta": {},
       "mult_l": "*",
-      "mult_r": "*"
+      "mult_r": "*",
+      "name": "NetworkAccess"
+    },
+    {
+      "asset_l": "Host",
+      "asset_r": "Password",
+      "field_l": "host",
+      "field_r": "passwords",
+      "meta": {},
+      "mult_l": "1",
+      "mult_r": "*",
+      "name": "Credentials"
+    },
+    {
+      "asset_l": "User",
+      "asset_r": "Password",
+      "field_l": "user",
+      "field_r": "passwords",
+      "meta": {},
+      "mult_l": "1",
+      "mult_r": "*",
+      "name": "Credentials"
     }
-  },
+  ],
   "categories": {
     "System": {
       "assets": {
@@ -34,9 +46,6 @@
             },
             "authenticate": {
               "cia": null,
-              "leads_to": {
-                "0": "access"
-              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -44,9 +53,6 @@
             },
             "connect": {
               "cia": null,
-              "leads_to": {
-                "0": "access"
-              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -54,9 +60,6 @@
             },
             "guessPassword": {
               "cia": null,
-              "leads_to": {
-                "0": "guessedPassword"
-              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -64,9 +67,6 @@
             },
             "guessedPassword": {
               "cia": null,
-              "leads_to": {
-                "0": "authenticate"
-              },
               "meta": {},
               "probability": "Exponential(0.02)",
               "tags": [],
@@ -81,9 +81,6 @@
           "attributes": {
             "access": {
               "cia": null,
-              "leads_to": {
-                "0": "hosts.connect"
-              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -98,9 +95,6 @@
           "attributes": {
             "obtain": {
               "cia": null,
-              "leads_to": {
-                "0": "host.authenticate"
-              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -115,9 +109,6 @@
           "attributes": {
             "attemptPhishing": {
               "cia": null,
-              "leads_to": {
-                "0": "phish"
-              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -125,9 +116,6 @@
             },
             "phish": {
               "cia": null,
-              "leads_to": {
-                "0": "passwords.obtain"
-              },
               "meta": {},
               "probability": "Exponential(0.1)",
               "tags": [],
