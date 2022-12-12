@@ -8,15 +8,15 @@ Repo: https://github.com/victorazzam/demal
 Author: Victor Azzam
 '''
 
-__version__ = '1.2.3'
+__version__ = '1.2.4'
 __author__ = 'Victor Azzam'
 
 import os, io, re, sys, copy, json, inspect
 
-# Check if the terminal supports styled output
+# Check if the terminal supports styled output.
 colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
 
-# Define red, green, yellow, blue, cyan, white, underline, disable
+# Red, green, yellow, blue, cyan, white, underline, default.
 r, g, y, b, c, w, u, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,4,0))
 
 class MalParser:
@@ -239,12 +239,12 @@ class MalParser:
         X.A      collect (asset X's attack step A)
         X*.A     transitive, e.g. dir.subdir.subdir.file can be dir*.file
         [prob]   probability distribution, one of:
-                    Bernoulli(p)     Binomial(n, p)  Exponential(λ)           Gamma(k, θ)
-                    LogNormal(μ, σ)  Pareto(x, α)    TruncatedNormal(μ, σ^2)  Uniform(a, b)
+                   Bernoulli(p)     Binomial(n, p)  Exponential(λ)           Gamma(k, θ)
+                   LogNormal(μ, σ)  Pareto(x, α)    TruncatedNormal(μ, σ^2)  Uniform(a, b)
         {C,I,A}  (securiCAD only) confidentiality, integrity, availability (any combination)
         @hidden  (securiCAD only) hide from attack paths
         @debug   (securiCAD only) show only while testing
-        @trace   (securiCAD only) trace intermediary steps, e.g. userAccount.assume->action.perform
+        @trace   (securiCAD only) trace intermediary steps, e.g. userAccount.assume -> action.perform
         '''
         r_attr = re.compile(r'([|&#E]{1}|[!E]{2})\s+(\w+)(\s+\[([\w(). ,]+)\])?')
         r_cia = re.compile(r'{\s*([CIA])(,\s*([CIA])(,\s*([CIA]))?)?\s*}')
@@ -310,13 +310,14 @@ class MalParser:
             if (r := r_association.match(line)):
                 asset_l, field_l, mult_l, link, mult_r, field_r, asset_r = r.groups()
                 if 'associations' not in self.result:
-                    self.result['associations'] = {}
-                last_link = self.result['associations'][link] = {
+                    self.result['associations'] = []
+                self.result['associations'].append({
+                    'name': link,        'meta': {},
                     'asset_l': asset_l,  'asset_r': asset_r,
                     'field_l': field_l,  'field_r': field_r,
-                    'mult_l' : mult_l,   'mult_r' : mult_r,
-                    'meta': {}
-                }
+                    'mult_l' : mult_l,   'mult_r' : mult_r
+                })
+                last_link = self.result['associations'][-1]
             elif (r := r_meta.match(line)) and last_link:
                 last_link['meta'][r.group(1)] = r.group(2)
 
