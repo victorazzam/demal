@@ -3,21 +3,20 @@
 '''
 demal
 -----
-Description: MAL (Meta Attack Language) to JSON decoding library and command-line tool.
-Repo: https://github.com/victorazzam/demal
-Author: Victor Azzam
+MAL (Meta Attack Language) to JSON encoding/decoding library and command-line tool.
 '''
 
-__version__ = '1.2.4'
+__version__ = '2.0.0'
 __author__ = 'Victor Azzam'
+__url__ = 'https://github.com/victorazzam/demal'
 
 import os, io, re, sys, copy, json, inspect
 
 # Check if the terminal supports styled output.
 colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
 
-# Red, green, yellow, blue, cyan, white, underline, default.
-r, g, y, b, c, w, u, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,4,0))
+# Red, green, yellow, blue, cyan, white, default.
+r, g, y, b, c, w, z = (f'\x1b[{x}m' * colors for x in (91,92,93,94,96,97,0))
 
 class MalParser:
     '''
@@ -106,6 +105,7 @@ class MalParser:
         '''
         print(msg, file=sys.stderr, flush=True)
         self.stop = True
+        return 1
 
     def dump(self, out = None, pretty = True):
         '''
@@ -124,6 +124,127 @@ class MalParser:
         with io.open(output, 'w', newline='\n') as f:
             json.dump(self.result, f, sort_keys=pretty, indent=pretty*2)
             f.write('\n')
+
+    def dump_mal(self, out = None):
+        '''
+        Generate a MAL file from the results dictionary.
+        '''
+        try:
+            f = io.StringIO()
+            f.write(f'// Output from demal v{__version__}\n')
+
+            # Read strings first to keep them up top.
+            for key, value in self.result.items():
+                if type(value) is str:
+                    f.write(f'\n#{key}: "{value}"')
+            f.write('\n')
+
+            # Then process the other objects.
+            for key, value in self.result.items():
+                if key == 'categories' and type(value) is dict:
+                    for cname, category in value.items():
+                        self._dump_category(f, cname, category)
+                elif key == 'associations' and type(value) is list:
+                    self._dump_associations(f, value)
+                elif self.debug:
+                    print(f'Unrecognized MAL pattern:', repr(key), ':', repr(value), file=sys.stderr, flush=True)
+        except Exception:
+            return self.quit('Current JSON configuration incompatible with MAL syntax.')
+
+        # Output to file or terminal.
+        f.seek(0)
+        output = 'output.mal'
+        if type(out) is str and out:
+            output = out
+        elif out == sys.stdout:
+            for i in f.read().splitlines():
+                print(i)
+            return
+        elif type(self.src) is str:
+            output = self.src + '.mal'
+        with io.open(output, 'w', newline='\n') as file:
+            f.seek(0)
+            file.write(f.read())
+
+    @staticmethod
+    def _dump_meta(obj, indent_level = 1):
+        '''
+        Metadata helper for generating MAL files.
+        '''
+        meta = []
+        indent = '  ' * indent_level
+        if type(obj) is dict and 'meta' in obj and type(obj['meta']) is dict:
+            for key, value in obj['meta'].items():
+                meta.append(f'{indent}{key}: "{value}"')
+        return '\n'.join(meta)
+
+    def _dump_category(self, f, cname, cat):
+        '''
+        Category helper for generating MAL files.
+        '''
+        meta = self._dump_meta(cat)
+        f.write(f'\ncategory {cname}')
+        f.write(f'\n{meta}\n{{\n' if meta else ' {\n')
+        first = True
+        for name, asset in cat['assets'].items():
+            if not first:
+                f.write('\n')
+            first = False
+            self._dump_asset(f, name, asset)
+        f.write('}\n')
+
+    def _dump_asset(self, f, name, asset):
+        '''
+        Asset helper for generating MAL files.
+        '''
+        meta = self._dump_meta(asset, 2)
+        abstract = 'abstract ' if asset['abstract'] else ''
+        extends = ' extends ' + asset['extends'] if asset['extends'] else ''
+        f.write(f'  {abstract}asset {name}{extends}')
+        f.write(f'\n{meta}\n  {{\n' if meta else ' {\n')
+
+        kinds = dict(zip('or and defense exists lacks'.split(), '| & # E !E'.split()))
+        sym = dict(zip('append leads_to require'.split(), '+> -> <-'.split()))
+        for a_name, attr in asset['attributes'].items():
+            # First line
+            a = []
+            if attr['probability']:
+                a.append('[' + attr['probability'] + ']')
+            if attr['cia']:
+                a.append('{' + ','.join(attr['cia']) + '}')
+            if attr['tags']:
+                for tag in attr['tags']:
+                    a.append('@' + tag)
+            f.write(f'    {kinds[attr["type"]]} {a_name}' + (' ' if a else '') + ' '.join(a))
+
+            # Possible metadata
+            meta = self._dump_meta(attr, 3)
+            f.write(f'\n{meta}\n' if meta else '\n')
+
+            # Attributes
+            for key in attr:
+                if key in sym:
+                    for i, expr in enumerate(attr[key].items()):
+                        k, v = expr
+                        expr = v if k.isdigit() else f'let {k} = {v}'
+                        if i == 0:
+                            f.write(f'{"":6}{sym[key]} {expr}')
+                        else:
+                            f.write(f',\n{"":9}{expr}')
+                    f.write('\n')
+
+        f.write('  }\n')
+
+    def _dump_associations(self, f, associations):
+        '''
+        Association helper for generating MAL files.
+        '''
+        f.write('\nassociations {\n')
+        for a in associations:
+            f.write(f'  {a["asset_l"]} [{a["field_l"]}] {a["mult_l"]} <-- {a["name"]} --> {a["mult_r"]} [{a["field_r"]}] {a["asset_r"]}')
+            meta = self._dump_meta(a, 2)
+            f.write(f'\n{meta}\n' if meta else '\n')
+        f.write('}\n')
 
     def iterate(self, file):
         '''
@@ -177,11 +298,11 @@ class MalParser:
                 elif r_associations.match(line):
                     self.parse_associations(code, line)
                 else:
-                    self.quit(f'Improper syntax: {repr(line)}')
+                    return self.quit(f'Improper syntax: {repr(line)}')
         except StopIteration:
-            self.quit(f'Incomplete script at:\n {repr(line)}')
+            return self.quit(f'Incomplete script at:\n {repr(line)}')
         except Exception as e:
-            self.quit(f'Error at: {repr(line)}\nMessage: {e}')
+            return self.quit(f'Error at: {repr(line)}\nMessage: {e}')
 
     def parse_header(self, code, line, cat=None):
         '''
@@ -278,7 +399,7 @@ class MalParser:
         Parse asset expressions.
         '''
         r_let = re.compile(r'let ([A-Za-z_]\w*)\s*=\s*"?([^"]+)"?')
-        m = [x for x in field if type(x) is int]
+        m = [int(x) for x in field if x.isdigit()]
         i = max(m) + 1 if m else 0
         while 1:
             if (r := r_let.match(line)):
@@ -327,44 +448,52 @@ def cli(arg):
     Handle command line arguments.
     '''
     usage = f'''
-{w}Usage:{z} demal <{g}input{z}> [{c}output{z}] [{y}debug{z}] [-v|--version]\n
- {g}input {w}format:{z}  {u}somefile.mal{z}  {w}or {r}- {w}to read from stdin
- {c}output {w}format:{z} {u}somefile.json{z} {w}or {r}- {w}to write to stdout\n
- {w}if {c}output {w}is missing, the program will either:
-  write to{z} {u}somefile.mal.json{z} {w}if {g}input {w}is{z} {u}somefile.mal{z}
-  {w}write to{z} {u}output.mal.json{z} {w}if {g}input {w}is {r}- {w}(stdin)\n
- append {y}debug {w}to print debug trace messages{z}
+{w}Usage:{z} demal <{g}input{z}> [{c}output{z}] [-r|--reverse] [{y}debug{z}] [-v|--version]
+
+{w}Read from stdin when {g}input {w}is {r}- {w}and write to stdout when {c}output {w}is {r}-
+
+{w}By default{z} .mal {w}or{z} .json {w}is appended to the output filename, depending on the source, else{z} output.mal {w}or{z} output.json {w}is used.
+
+Append {y}debug {w}to print parser trace messages.{z}
 '''
     if '-v' in arg or '--version' in arg:
         print(__version__)
         sys.exit(0)
-    if len(arg) < 2:
+    if len(arg) < 2 or '-h' in arg or '--help' in arg:
         sys.exit(usage)
     elif arg[1] == '-':
         file = sys.stdin
-    elif arg[1].lower().endswith('.mal'):
-        file = arg[1]
     else:
-        sys.exit(usage)
+        file = arg[1]
     out = None
     if len(arg) > 2:
         if arg[2] == '-':
             out = sys.stdout
-        elif arg[2].lower().endswith('.json'):
-            out = arg[2]
-        elif arg[2] == 'debug':
+        elif arg[2] in ('debug', '-r', '--reverse'):
             pass
         else:
-            sys.exit(usage)
-    return file, out, 'debug' in arg
+            out = arg[2]
+    return file, out, 'debug' in arg, any(x in arg[2:] for x in ('-r', '--reverse'))
 
 def main():
     '''
     Run as a standalone application.
     '''
-    file, out, debug = cli(sys.argv)
+    file, out, debug, to_mal = cli(sys.argv)
+    if file is not sys.stdin and not os.path.isfile(file):
+        sys.exit(f'Error while opening {file}')
+    if to_mal:
+        with open(file) as f:
+            mal = MalParser(file)
+            mal.result = json.load(f)
+            error = mal.dump_mal(out=out)
+            if error:
+                sys.exit(1)
+        return
     mal = MalParser(file, debug=debug)
-    mal.parse()
+    error = mal.parse()
+    if error:
+        sys.exit(1)
     mal.dump(out=out, pretty=True)
 
 if __name__ == '__main__':

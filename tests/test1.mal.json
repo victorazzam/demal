@@ -46,6 +46,9 @@
             },
             "authenticate": {
               "cia": null,
+              "leads_to": {
+                "0": "access"
+              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -53,6 +56,9 @@
             },
             "connect": {
               "cia": null,
+              "leads_to": {
+                "0": "access"
+              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -60,6 +66,9 @@
             },
             "guessPassword": {
               "cia": null,
+              "leads_to": {
+                "0": "guessedPassword"
+              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -67,6 +76,9 @@
             },
             "guessedPassword": {
               "cia": null,
+              "leads_to": {
+                "0": "authenticate"
+              },
               "meta": {},
               "probability": "Exponential(0.02)",
               "tags": [],
@@ -81,8 +93,15 @@
           "attributes": {
             "access": {
               "cia": null,
+              "leads_to": {
+                "0": "hosts.connect",
+                "1": "lmn.opq"
+              },
               "meta": {},
               "probability": null,
+              "require": {
+                "0": "abc.def"
+              },
               "tags": [],
               "type": "or"
             }
@@ -95,6 +114,9 @@
           "attributes": {
             "obtain": {
               "cia": null,
+              "leads_to": {
+                "0": "host.authenticate"
+              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -109,6 +131,9 @@
           "attributes": {
             "attemptPhishing": {
               "cia": null,
+              "leads_to": {
+                "0": "phish"
+              },
               "meta": {},
               "probability": null,
               "tags": [],
@@ -116,6 +141,9 @@
             },
             "phish": {
               "cia": null,
+              "leads_to": {
+                "0": "passwords.obtain"
+              },
               "meta": {},
               "probability": "Exponential(0.1)",
               "tags": [],

@@ -1,4 +1,4 @@
-from demal import MalParser
+from demal import MalParser, sys
 
 print('Parse and combine two test files.')
 m1, m2 = MalParser('test1.mal'), MalParser('test2.mal')
@@ -36,3 +36,6 @@ print('m (m1+m2):', list(m))
 # m1: ['System.Host', 'System.Network', 'System.Password', 'System.User']
 # m2: ['C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
 # m (m1+m2): ['System.Host', 'System.Network', 'System.Password', 'System.User', 'C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
+
+print('\nConvert JSON back to MAL syntax.')
+m.dump_mal(out = sys.stdout)

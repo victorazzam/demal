@@ -1,0 +1,43 @@
+// Output from demal v2.0.0
+
+#id: "org.mal-lang.examplelang"
+#version: "1.0.0"
+
+associations {
+  Network [networks] * <-- NetworkAccess --> * [hosts] Host
+  Host [host] 1 <-- Credentials --> * [passwords] Password
+  User [user] 1 <-- Credentials --> * [passwords] Password
+}
+
+category System {
+  asset Host {
+    & access
+    | authenticate
+      -> access
+    | connect
+      -> access
+    | guessPassword
+      -> guessedPassword
+    | guessedPassword [Exponential(0.02)]
+      -> authenticate
+  }
+
+  asset Network {
+    | access
+      -> hosts.connect,
+         lmn.opq
+      <- abc.def
+  }
+
+  asset Password {
+    | obtain
+      -> host.authenticate
+  }
+
+  asset User {
+    | attemptPhishing
+      -> phish
+    | phish [Exponential(0.1)]
+      -> passwords.obtain
+  }
+}

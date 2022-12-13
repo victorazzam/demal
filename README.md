@@ -1,11 +1,13 @@
-# demal
+# [demal](https://github.com/victorazzam/demal)
 
 [![PyPI](https://img.shields.io/pypi/v/demal?logo=git&style=flat)](https://pypi.python.org/pypi/demal)
 [![Build](https://github.com/victorazzam/demal/actions/workflows/python-package.yml/badge.svg)](https://github.com/victorazzam/demal/actions/workflows/python-package.yml)
 [![Python](https://img.shields.io/pypi/pyversions/demal?logo=python&logoColor=yellow)](https://www.python.org/doc/versions/)
 [![License](https://img.shields.io/github/license/victorazzam/demal)](https://github.com/victorazzam/demal/blob/master/LICENSE)
 
-MAL (Meta Attack Language) to JSON decoding library and command-line tool.
+#### MAL (Meta Attack Language) to JSON encoding/decoding library and command-line tool.
+
+Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible with the [official tool](https://github.com/mal-lang/mal2json).
 
 ## Info
 
@@ -13,7 +15,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 **License:** MIT
 
-**Latest version:** `1.2.4`
+**Latest version:** `2.0.0`
 
 **Requires:** Python 3.8 or later
 
@@ -38,16 +40,21 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 ```
 
 ### General usage
-![https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg](https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg)
+![https://raw.githubusercontent.com/victorazzam/demal/main/usage.jpg](usage.jpg)
 
 ### Convert `file.mal` to `file.mal.json`
 ```shell
 ~ demal file.mal
 ```
 
-### Convert `file.mal` to `output.json`
+### Convert `file.mal` to `file.json`
 ```shell
-~ demal file.mal output.json
+~ demal file.mal file.json
+```
+
+### Revert `file.json` to `file.mal` (if JSON abides by [demal's output](#output))
+```shell
+~ demal file.json file.mal -r
 ```
 
 ### Convert `file.mal` and print it out
@@ -72,7 +79,7 @@ MAL (Meta Attack Language) to JSON decoding library and command-line tool.
 
 ### Display debugging information while converting
 ```shell
-~ demal test1.mal debug
+~ demal test2.mal debug
 parse got: '#id: "tmp"'
 parse got: '#version: "0.0.0"'
 parse got: 'category C1 {'
@@ -146,67 +153,74 @@ print('m (m1+m2):', list(m))
 # m1: ['System.Host', 'System.Network', 'System.Password', 'System.User']
 # m2: ['C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
 # m (m1+m2): ['System.Host', 'System.Network', 'System.Password', 'System.User', 'C2.A1', 'C2.A2', 'C2.A3', 'C2.A4', 'C2.A5', 'C2.A6', 'C3.A1', 'C4.A1', 'C5.distribution']
+
+print('\nConvert JSON back to MAL syntax.')
+m.dump_mal(out = sys.stdout)
+# Output redacted
 ```
 
 ## Output
-This program produces the following approximate output:
+Expect the following approximate output structure when converting to JSON:
 
 ```py
 {
-  "associations": {
-	"Association": {
-	  "asset_l": "left_asset",
-	  "asset_r": "right_asset",
-	  "field_l": "left_field",
-	  "field_r": "right_field",
-	  "meta": {
-		"key": "value"
-		# ...
-	  },
-	  "mult_l": "left_multiplier",
-	  "mult_r": "right_multiplier"
-	} # ...
-  },
+  "associations": [
+    {
+      "asset_l": "left_asset",
+      "asset_r": "right_asset",
+      "field_l": "left_field",
+      "field_r": "right_field",
+      "meta": {
+        "key": "value"
+        # ...
+      },
+      "mult_l": "left_multiplier",
+      "mult_r": "right_multiplier",
+      "name": "Association"
+    } # ...
+  ],
   "categories": {
-	"Category1": {
-	  "assets": {
-		"Asset1": {
-		  "abstract": false,
-		  "attributes": {
-			"access": {
-			  "cia": null,
-			  "meta": {},
-			  "probability": "Exponential(0.02)", # etc, or simply null
-			  "tags": [],
-			  "type": "and"
-			},
-			"authenticate": {
-			  "cia": null,
-			  "leads_to": {
-				"0": "access",
-				"a": "b \\/ c " # result of: let a = ...
-			  },
-			  "meta": {},
-			  "probability": null,
-			  "tags": [
-				"hidden",
-				"debug",
-				"trace"
-			  ],
-			  "type": "or"
-			} # ...
-		  },
-		  "extends": null,
-		  "meta": {}
-		} # ...
-	  },
-	  "meta": {}
-	}
+    "Category1": {
+      "assets": {
+        "Asset1": {
+          "abstract": false,
+          "attributes": {
+            "access": {
+              "cia": ["C", "A"],
+              "meta": {},
+              "probability": "Exponential(0.02)", # etc, or simply null
+              "tags": [],
+              "type": "and"
+            },
+            "authenticate": {
+              "cia": null,
+              "leads_to": {
+                "0": "access",
+                "a": "b \\/ c " # result of: let a = ...
+              },
+              "meta": {},
+              "probability": null,
+              "tags": [
+                "hidden",
+                "debug",
+                "trace"
+              ],
+              "type": "or"
+            } # ...
+          },
+          "extends": null,
+          "meta": {}
+        } # ...
+      },
+      "meta": {}
+    }
   },
   "id": "org.name.project",
   "version": "1.0.0"
 }
 ```
+
+When converting to MAL the output should closely resemble the original, albeit more concise.
 
 ## Limitations
  - [X] ~Multi-line comments should be avoided.~
