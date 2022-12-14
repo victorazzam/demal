@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/demal?logo=git&style=flat)](https://pypi.python.org/pypi/demal)
 [![Build](https://github.com/victorazzam/demal/actions/workflows/python-package.yml/badge.svg)](https://github.com/victorazzam/demal/actions/workflows/python-package.yml)
 [![Python](https://img.shields.io/pypi/pyversions/demal?logo=python&logoColor=yellow)](https://www.python.org/doc/versions/)
-[![License](https://img.shields.io/github/license/victorazzam/demal)](https://github.com/victorazzam/demal/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/victorazzam/demal)](https://github.com/victorazzam/demal/blob/master/LICENSE.txt)
 
 #### MAL (Meta Attack Language) to JSON encoding/decoding library and command-line tool.
 
@@ -15,7 +15,7 @@ Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible wi
 
 **License:** MIT
 
-**Latest version:** `2.0.0`
+**Latest version:** `2.1.0`
 
 **Requires:** Python 3.8 or later
 
@@ -52,7 +52,7 @@ Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible wi
 ~ demal file.mal file.json
 ```
 
-### Revert `file.json` to `file.mal` (if JSON abides by [demal's output](#output))
+### Convert `file.json` to `file.mal` (if JSON abides by [demal's output](#output))
 ```shell
 ~ demal file.json file.mal -r
 ```
@@ -104,14 +104,14 @@ mal.parse() # displays debugging messages due to the previous line
 mal.dump(out='parsed.json', pretty=True) # beautify and save to parsed.json
 print(mal) # pretty-prints the json object
 {
-  "associations": {
-    "Connection": {
+  "associations": [
+    {
       "asset_l": "Server",
       "asset_l": "Client",
 # output truncated
 ```
 
-#### Merge multiple instances by addition (also multiplication and bitwise-or)
+#### Merge multiple instances by addition (or multiplication or bitwise-or) akin to using `include`
 Check `tests/test-lib.py`:
 
 ```py

@@ -6,11 +6,14 @@ demal
 MAL (Meta Attack Language) to JSON encoding/decoding library and command-line tool.
 '''
 
-__version__ = '2.0.0'
+__version__ = '2.1.0'
 __author__ = 'Victor Azzam'
 __url__ = 'https://github.com/victorazzam/demal'
 
 import os, io, re, sys, copy, json, inspect
+
+# Default
+CLI = False
 
 # Check if the terminal supports styled output.
 colors = 'win' not in sys.platform or any(os.getenv(x) is not None for x in ('WT_SESSION', 'WT_PROFILE_ID'))
@@ -34,15 +37,15 @@ class MalParser:
 
     def __repr__(self):
         '''
-        Representation when referenced.
+        Object representation.
         '''
-        return json.dumps(self.result, sort_keys=True, indent=2) + '\n'
+        return f"<MalParser object: '{self.src}'>"
 
     def __str__(self):
         '''
-        String representation, minified.
+        String representation.
         '''
-        return json.dumps(self.result, sort_keys=True)
+        return json.dumps(self.result, sort_keys=True, indent=2)
 
     def __add__(self, other):
         '''
@@ -105,19 +108,19 @@ class MalParser:
         '''
         print(msg, file=sys.stderr, flush=True)
         self.stop = True
-        return 1
+        return 1 if CLI else None
 
     def dump(self, out = None, pretty = True):
         '''
         Output a JSON file with the results.
         '''
         pretty = pretty is True
-        output = 'output.mal.json'
+        output = 'output.json'
         if type(out) is str and out:
             output = out
-        elif out == sys.stdout:
-            for i in (repr(self) if pretty else str(self)).splitlines():
-                print(i)
+        elif hasattr(out, 'write'):
+            for i in str(self).splitlines():
+                out.write(i + '\n')
             return
         elif type(self.src) is str:
             output = self.src + '.json'
@@ -130,6 +133,11 @@ class MalParser:
         Generate a MAL file from the results dictionary.
         '''
         try:
+            # Prevent empty file
+            if not self.result:
+                return self.quit('Error: empty file.')
+
+            # Temporary file-like object
             f = io.StringIO()
             f.write(f'// Output from demal v{__version__}\n')
 
@@ -156,9 +164,9 @@ class MalParser:
         output = 'output.mal'
         if type(out) is str and out:
             output = out
-        elif out == sys.stdout:
+        elif hasattr(out, 'write'):
             for i in f.read().splitlines():
-                print(i)
+                out.write(i + '\n')
             return
         elif type(self.src) is str:
             output = self.src + '.mal'
@@ -251,7 +259,7 @@ class MalParser:
         Iterate a file line by line.
         '''
         try:
-            file = file if file is sys.stdin else open(file)
+            file = file if hasattr(file, 'read') else open(file)
             with file as f:
                 data = f.read()
 
@@ -300,7 +308,8 @@ class MalParser:
                 else:
                     return self.quit(f'Improper syntax: {repr(line)}')
         except StopIteration:
-            return self.quit(f'Incomplete script at:\n {repr(line)}')
+            if self.stop == False:
+                return self.quit(f'Incomplete script at:\n {repr(line)}')
         except Exception as e:
             return self.quit(f'Error at: {repr(line)}\nMessage: {e}')
 
@@ -442,6 +451,8 @@ class MalParser:
                 last_link = self.result['associations'][-1]
             elif (r := r_meta.match(line)) and last_link:
                 last_link['meta'][r.group(1)] = r.group(2)
+            else:
+                self.quit(f'Improper syntax: {repr(line)}')
 
 def cli(arg):
     '''
@@ -479,16 +490,19 @@ def main():
     '''
     Run as a standalone application.
     '''
+    global CLI
+    CLI = True
     file, out, debug, to_mal = cli(sys.argv)
     if file is not sys.stdin and not os.path.isfile(file):
         sys.exit(f'Error while opening {file}')
     if to_mal:
-        with open(file) as f:
-            mal = MalParser(file)
+        mal = MalParser(file)
+        file = file if file is sys.stdin else open(file)
+        with file as f:
             mal.result = json.load(f)
-            error = mal.dump_mal(out=out)
-            if error:
-                sys.exit(1)
+        error = mal.dump_mal(out=out)
+        if error:
+            sys.exit(1)
         return
     mal = MalParser(file, debug=debug)
     error = mal.parse()
