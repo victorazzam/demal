@@ -11,11 +11,11 @@ try:
         m.parse()
         md5 = hashlib.md5(f'{m}\n'.encode()).hexdigest()
         cmds = {
-          f'python demal.py {t} && md5sum {t}.json'            : None,
-          f'python demal.py {t} abc.json && md5sum abc.json'   : 'abc.json',
-          f'python demal.py {t} - | md5sum'                    : None,
-          f'cat {t} | python demal.py - && md5sum output.json' : 'output.json',
-          f'cat {t} | python demal.py - - | md5sum'            : None
+          f'demal {t} && md5sum {t}.json'            : None,
+          f'demal {t} abc.json && md5sum abc.json'   : 'abc.json',
+          f'demal {t} - | md5sum'                    : None,
+          f'cat {t} | demal - && md5sum output.json' : 'output.json',
+          f'cat {t} | demal - - | md5sum'            : None
         }
         print(f'Testing: {t}\nExpecting: {md5}\n')
         for cmd, rem in cmds.items():
@@ -38,11 +38,11 @@ try:
         s.seek(0)
         md5 = hashlib.md5(s.read().encode()).hexdigest()
         cmds = {
-          f'python demal.py {name} -r && md5sum {name}.mal'         : f'{name}.mal',
-          f'python demal.py {name} abc.mal -r && md5sum abc.mal'    : 'abc.mal',
-          f'python demal.py {name} - -r | md5sum'                   : None,
-          f'cat {name} | python demal.py - -r && md5sum output.mal' : 'output.mal',
-          f'cat {name} | python demal.py - - -r | md5sum'           : name
+          f'demal {name} -r && md5sum {name}.mal'         : f'{name}.mal',
+          f'demal {name} abc.mal -r && md5sum abc.mal'    : 'abc.mal',
+          f'demal {name} - -r | md5sum'                   : None,
+          f'cat {name} | demal - -r && md5sum output.mal' : 'output.mal',
+          f'cat {name} | demal - - -r | md5sum'           : name
         }
         print(f'Expecting: {md5}\n')
         for cmd, rem in cmds.items():
