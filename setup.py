@@ -6,9 +6,9 @@ from shutil import rmtree
 setup(
                            name = 'demal',
                          author = 'Victor Azzam',
-                    description = 'MAL (Meta Attack Language) to JSON decoding library and command-line tool.',
+                    description = 'MAL (Meta Attack Language) to JSON encoding/decoding library and command-line tool.',
                long_description = open('README.md').read().strip(),
-  long_description_content_type = "text/markdown",
+  long_description_content_type = 'text/markdown',
                         license = 'MIT',
                             url = 'https://github.com/victorazzam/demal',
                    download_url = "https://github.com/victorazzam/demal/releases",

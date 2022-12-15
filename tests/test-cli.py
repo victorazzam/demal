@@ -1,58 +1,53 @@
 import io, os, sys, json, demal, hashlib
 
-if 'win' in sys.platform:
-    sys.exit('These tests are not compatible with Windows.')
+def run(cmds):
+    for cmd, md5, rem in cmds:
+        print(f'Command: {cmd}')
+        p = os.popen(cmd).read().strip()
+        if rem:
+            os.remove(rem)
+        assert p == md5, f'Expected {md5} but found {repr(p)}'
 
-try:
-    for t in ('test1.mal', 'test2.mal'):
+def main():
+    # Program to use to echo files
+    view = 'type' if '\\' in os.popen('whoami').read() else 'cat'
+
+    for file in ('test1.mal', 'test2.mal'):
+        print(f'\nTesting: {file}')
 
         # To JSON
-        m = demal.MalParser(t)
+        m = demal.MalParser(file)
         m.parse()
-        md5 = hashlib.md5(f'{m}\n'.encode()).hexdigest()
-        cmds = {
-          f'demal {t} && md5sum {t}.json'            : None,
-          f'demal {t} abc.json && md5sum abc.json'   : 'abc.json',
-          f'demal {t} - | md5sum'                    : None,
-          f'cat {t} | demal - && md5sum output.json' : 'output.json',
-          f'cat {t} | demal - - | md5sum'            : None
-        }
-        print(f'Testing: {t}\nExpecting: {md5}\n')
-        for cmd, rem in cmds.items():
-            print(f'Command: {cmd}')
-            p = os.popen(cmd).read()
-            p = p.split()[0]
-            if rem:
-                os.remove(rem)
-            print(f'Found: {p}\n')
-            assert p == md5
+        md5_1 = hashlib.md5(f'{m}\n'.encode()).hexdigest()
+        cmds = [
+          ( f'demal {file} | python md5sum.py {file}.json'            , md5_1 ,     None      ),
+          ( f'demal {file} abc.json | python md5sum.py abc.json'      , md5_1 , 'abc.json'    ),
+          ( f'demal {file} - | python md5sum.py'                      , md5_1 ,     None      ),
+          ( f'{view} {file} | demal - | python md5sum.py output.json' , md5_1 , 'output.json' ),
+          ( f'{view} {file} | demal - - | python md5sum.py'           , md5_1 ,     None      )
+        ]
+        run(cmds)
 
         # To MAL
-        del m
-        name = f'{t}.json'
-        m = demal.MalParser(name)
-        with open(name) as f:
+        new = file + '.json'
+        m = demal.MalParser(new)
+        with io.open(new, newline='\n') as f:
             m.result = json.load(f)
         s = io.StringIO()
         m.dump_mal(out=s)
         s.seek(0)
-        md5 = hashlib.md5(s.read().encode()).hexdigest()
-        cmds = {
-          f'demal {name} -r && md5sum {name}.mal'         : f'{name}.mal',
-          f'demal {name} abc.mal -r && md5sum abc.mal'    : 'abc.mal',
-          f'demal {name} - -r | md5sum'                   : None,
-          f'cat {name} | demal - -r && md5sum output.mal' : 'output.mal',
-          f'cat {name} | demal - - -r | md5sum'           : name
-        }
-        print(f'Expecting: {md5}\n')
-        for cmd, rem in cmds.items():
-            print(f'Command: {cmd}')
-            p = os.popen(cmd).read().split()[0]
-            if rem:
-                os.remove(rem)
-            print(f'Found: {p}\n')
-            assert p == md5
+        md5_2 = hashlib.md5(s.read().encode()).hexdigest()
+        cmds += [
+          ( f'demal {new} -r | python md5sum.py {new}.mal'             , md5_2 , new + '.mal' ),
+          ( f'demal {new} abc.mal -r | python md5sum.py abc.mal'       , md5_2 , 'abc.mal'    ),
+          ( f'demal {new} - -r | python md5sum.py'                     , md5_2 ,     None     ),
+          ( f'{view} {new} | demal - -r | python md5sum.py output.mal' , md5_2 , 'output.mal' ),
+          ( f'{view} {new} | demal - - -r | python md5sum.py'          , md5_2 , new          )
+        ]
+        run(cmds)
 
-    print('Passed')
-except AssertionError:
-    sys.exit('Failed')
+try:
+    main()
+    print('\nPassed\n')
+except Exception as e:
+    sys.exit(f'Error: {e}\n\nFailed\n')

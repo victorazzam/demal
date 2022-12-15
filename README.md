@@ -28,15 +28,12 @@ Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible wi
 ~ pip install demal
 ```
 
-### Or install from source
+#### or
+
+### Install from source
 ```shell
 ~ git clone https://github.com/victorazzam/demal
 ~ cd demal && pip install .
-```
-
-### Uninstall
-```shell
-~ pip uninstall demal
 ```
 
 ### General usage
@@ -79,7 +76,7 @@ Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible wi
 
 ### Display debugging information while converting
 ```shell
-~ demal test2.mal debug
+~ demal tests/test2.mal debug
 parse got: '#id: "tmp"'
 parse got: '#version: "0.0.0"'
 parse got: 'category C1 {'
