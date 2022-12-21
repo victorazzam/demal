@@ -157,7 +157,46 @@ m.dump_mal(out = sys.stdout)
 ```
 
 ## Output
-Expect the following approximate output structure when converting to JSON:
+The following output JSON structure is produced ("*quotes*" are placeholders, `monospace` shows exact values, | denotes "choose one of"):
+
+- Array: `associations`
+  - Object:
+    - Object: `meta`
+      - String: "*key*"
+        - String: "*value*"
+    - String: `asset_l`, `field_l`, `mult_l`, `name`, `mult_r`, `field_r`, `asset_r`
+- Object: `categories`
+  - Object: "*category name*"
+    - Object: `meta`
+      - String: "*key*"
+        - String: "*value*"
+    - Object: `assets`
+      - Object: `meta`
+        - String: "*key*"
+          - String: "*value*"
+      - Object: "*asset name*"
+        - Boolean: `abstract`
+        - Object: `attributes`
+          - Object: "*attribute name*"
+            - Array: `cia`
+              - String (length=1): `C` | `I` | `A` (MAL: `{CIA}`)
+            - Object: `meta`
+              - String: "*key*"
+                - String: "*value*"
+            - String (nullable): `probability`
+            - Array: `tags`
+              - String: `hidden` | `debug` | `trace` (MAL: `@hidden` `@debug` `@trace`)
+            - String: `type`
+              - String: `or` | `and` | `defense` | `exists` | `lacks` (MAL: `|` `&` `#` `E` `!E`)
+            - Object: `append` | `leads_to` | `require` (MAL: `+>` `->` `<-`)
+              - String: "*key or number*"
+                - String: "*expression or action*"
+        - String (nullable): `extends`
+        - Object: `meta`
+          - String: "*key*"
+            - String: "*value*"
+
+Example:
 
 ```py
 {
