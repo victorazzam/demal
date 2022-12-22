@@ -128,6 +128,8 @@ class MalParser:
             json.dump(self.result, f, sort_keys=pretty, indent=pretty*2)
             f.write('\n')
 
+        print(f'{len(str(self)) + 1} bytes written to {output}')
+
     def dump_mal(self, out = None):
         '''
         Generate a MAL file from the results dictionary.
@@ -173,6 +175,9 @@ class MalParser:
         with io.open(output, 'w', newline='\n') as file:
             f.seek(0)
             file.write(f.read())
+
+        f.seek(0)
+        print(f'{len(f.read()) + 1} bytes written to {output}')
 
     @staticmethod
     def _dump_meta(obj, indent_level = 1):
