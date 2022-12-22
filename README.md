@@ -183,7 +183,8 @@ The following output JSON structure is produced ("*quotes*" are placeholders, `m
             - Object: `meta`
               - String: "*key*"
                 - String: "*value*"
-            - String (nullable): `probability`
+            - String: `probability`
+              - String (nullable): one of several probability distributions [outlined here](https://github.com/mal-lang/mal-documentation/wiki/MAL-Syntax#probability-distributions)
             - Array: `tags`
               - String: `hidden` | `debug` | `trace` (MAL: `@hidden` `@debug` `@trace`)
             - String: `type`
@@ -191,7 +192,8 @@ The following output JSON structure is produced ("*quotes*" are placeholders, `m
             - Object: `append` | `leads_to` | `require` (MAL: `+>` `->` `<-`)
               - String: "*key or number*"
                 - String: "*expression or action*"
-        - String (nullable): `extends`
+        - String: `extends`
+          - String (nullable): "*asset to be extended*"
         - Object: `meta`
           - String: "*key*"
             - String: "*value*"
