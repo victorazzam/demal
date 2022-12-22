@@ -15,7 +15,7 @@ Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible wi
 
 **License:** MIT
 
-**Latest version:** `2.1.0`
+**Latest version:** `2.1.1`
 
 **Requires:** Python 3.8 or later
 

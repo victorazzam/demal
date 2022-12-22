@@ -6,7 +6,7 @@ demal
 MAL (Meta Attack Language) to JSON encoding/decoding library and command-line tool.
 '''
 
-__version__ = '2.1.0'
+__version__ = '2.1.1'
 __author__ = 'Victor Azzam'
 __url__ = 'https://github.com/victorazzam/demal'
 
