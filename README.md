@@ -112,7 +112,7 @@ print(mal) # pretty-prints the json object
 Check `tests/test-lib.py`:
 
 ```py
-from demal import MalParser
+from demal import MalParser, sys
 
 print('Parse and combine two test files.')
 m1, m2 = MalParser('test1.mal'), MalParser('test2.mal')
