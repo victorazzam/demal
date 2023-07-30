@@ -21,6 +21,13 @@ Convert from MAL to JSON and, as of version 2, from JSON to MAL. Incompatible wi
 
 **Batteries included:** Tests and examples are provided in this repository.
 
+## Contents
+
+- [Usage](#usage)
+- [Output](#output)
+- [Limitations](#limitations)
+- [Resources](#resources)
+
 ## Usage
 
 ### Install
